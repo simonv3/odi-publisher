@@ -23,7 +23,6 @@
         :input_html => { :class => "span7", :rows => 3, :disabled => @resource.published? } %>
 
     <%= f.label "keywords", class: 'control-label section-label' %>
-
     <div class='controls' id='keyword-controls'>
       <%= text_field_tag :keywords, "", {
         :class => "keyword-tags",

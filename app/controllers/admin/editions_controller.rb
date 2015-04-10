@@ -60,7 +60,7 @@ class Admin::EditionsController < Admin::BaseController
     update! do |success, failure|
       success.html {
         # Set the keywords in panopticon
-        set_keywords
+        set_keywords resource
 
         # Automatically start work if we haven't already
         if resource.can_start_work?
@@ -70,6 +70,7 @@ class Admin::EditionsController < Admin::BaseController
         # Assign to right person
         update_assignment resource, assign_to
         # Redirect
+
         return_to = params[:return_to] || admin_edition_path(resource)
         redirect_to return_to
       }
@@ -79,6 +80,9 @@ class Admin::EditionsController < Admin::BaseController
         render :template => "show"
       }
       success.json {
+        # Set the keywords in panopticon
+        set_keywords resource
+
         # Automatically start work if we haven't already
         if resource.can_start_work?
           command = EditionProgressor.new(resource, current_user, statsd)
@@ -146,11 +150,10 @@ class Admin::EditionsController < Admin::BaseController
       @available_keywords = Tag.where(tag_type: "keyword").map { |k| k.title }
     end
 
-    def set_keywords
+    def set_keywords(resource)
       new_keywords = create_keywords(params) if params[:edition][:keywords]
       if new_keywords
-        @resource.artefact.update_attributes!(keywords: new_keywords)
-        @resource.artefact.save
+        resource.artefact.update_attributes!(keywords: new_keywords)
       end
     end
 
